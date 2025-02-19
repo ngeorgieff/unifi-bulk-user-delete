@@ -28,17 +28,15 @@ FETCH_DEACTIVATE_HEADERS = {
 
 # Allowed active users (these users will NOT be deleted)
 ALLOWED_USERS = {
-    "a79ec2de-80c2-462a-a718-b43d4af752a8", #Name: api-admin , Status: ACTIVE
-    "b287b0cc-08fa-42cf-97a5-73a34617b3ec", #Name: Nikolay Georgiev, Status: ACTIVE
-    "1a731bdb-78b3-494a-be9e-1b7ff6030d18", #Name: Nikolay Test, Status: ACTIVE
-    "dee21433-a9ad-4ffd-ba8e-90582d2e5706", #Name: NIKOLAY GEORGIEV, Status: ACTIVE
-    "5e6c651c-5432-4dea-a349-266ff1e41317", #Name: Brian Yang, Status: ACTIVE
-    "680f4765-3d83-4c3f-a5f8-1641205fab3b", #Name: Yuiueno0520 , Status: ACTIVE
-    "dca3ae26-621e-42a1-8c7a-b41d5fa63c4a", #Name: Ae86rkw , Status: ACTIVE
-    "e930a4ae-5870-4937-ae03-3d9bce82c1fc", #Name: PATRICIA  SHMUCKER, Status: ACTIVE
-    "3497b9f7-780f-46e0-821e-a236d8cc53ec", #Name: PATRICIA SHMUCKER, Status: ACTIVE
+    "a79ec2de-80c2-462a-a718-b43d4af752a8", #Name: api-admin 
+    "b287b0cc-08fa-42cf-97a5-73a34617b3ec", #Name: N
+    "1a731bdb-78b3-494a-be9e-1b7ff6030d18", #Name: N
+    "dee21433-a9ad-4ffd-ba8e-90582d2e5706", #Name: N
+    "5e6c651c-5432-4dea-a349-266ff1e41317", #Name: BY
+    "680f4765-3d83-4c3f-a5f8-1641205fab3b", #Name: YU
+    "dca3ae26-621e-42a1-8c7a-b41d5fa63c4a", #Name: Ae
+    "3497b9f7-780f-46e0-821e-a236d8cc53ec", #Name: PS
 }
-
 # Global variables for session token and CSRF token (for delete action)
 SESSION_TOKEN = None
 CSRF_TOKEN = None
