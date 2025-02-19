@@ -2,7 +2,7 @@ import requests
 import os
 
 # UniFi UDM Pro IP Address
-UNIFI_CONSOLE_IP = "192.168.1.1"
+UNIFI_CONSOLE_IP = "192.168.1.231"
 API_KEY = os.getenv("UNIFI_API_KEY")
 
 # API Endpoint

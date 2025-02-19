@@ -1,15 +1,17 @@
+import os
 import requests
 import urllib3
-import os
 
 # Suppress SSL warnings for self-signed certs
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 # UniFi UDM Pro API Details
-UNIFI_CONSOLE_IP = "192.168.1.1"
+UNIFI_CONSOLE_IP = os.getenv("UNIFI_CONSOLE_IP") # Console IP
 
-# API Tokens
-FETCH_DEACTIVATE_API_KEY = os.getenv("UNIFI_API_KEY")  # Used for fetching and deactivating users
+# API Tokens & Credentials from Environment Variables
+API_KEY = os.getenv("UNIFI_API_KEY")  # API key for fetching & deactivating users
+LOCAL_ADMIN_USERNAME = os.getenv("UNIFI_ADMIN_USER")  # Local admin for deletion
+LOCAL_ADMIN_PASSWORD = os.getenv("UNIFI_ADMIN_PASS")
 
 # API Endpoints
 LOGIN_URL = f"https://{UNIFI_CONSOLE_IP}/api/auth/login"
@@ -17,20 +19,24 @@ FETCH_USERS_URL = f"https://{UNIFI_CONSOLE_IP}:12445/api/v1/developer/users"
 UPDATE_USER_URL = f"https://{UNIFI_CONSOLE_IP}:12445/api/v1/developer/users"
 DELETE_USER_URL = f"https://{UNIFI_CONSOLE_IP}/proxy/users/api/v2/user"
 
-# Local Admin Credentials
-LOCAL_ADMIN_USERNAME = os.getenv("UNIFI_ADMIN_USER")
-LOCAL_ADMIN_PASSWORD = os.getenv("UNIFI_ADMIN_PASS")
-
 # Headers for fetching & deactivating users (using API key)
 FETCH_DEACTIVATE_HEADERS = {
-    "Authorization": f"Bearer {FETCH_DEACTIVATE_API_KEY}",
+    "Authorization": f"Bearer {API_KEY}",
     "Accept": "application/json",
     "Content-Type": "application/json"
 }
 
 # Allowed active users (these users will NOT be deleted)
 ALLOWED_USERS = {
-    "d3950ced-0b7c-41fe-88f4-1251b076921a"  # List UIDs to skip
+    "a79ec2de-80c2-462a-a718-b43d4af752a8", #Name: api-admin , Status: ACTIVE
+    "b287b0cc-08fa-42cf-97a5-73a34617b3ec", #Name: Nikolay Georgiev, Status: ACTIVE
+    "1a731bdb-78b3-494a-be9e-1b7ff6030d18", #Name: Nikolay Test, Status: ACTIVE
+    "dee21433-a9ad-4ffd-ba8e-90582d2e5706", #Name: NIKOLAY GEORGIEV, Status: ACTIVE
+    "5e6c651c-5432-4dea-a349-266ff1e41317", #Name: Brian Yang, Status: ACTIVE
+    "680f4765-3d83-4c3f-a5f8-1641205fab3b", #Name: Yuiueno0520 , Status: ACTIVE
+    "dca3ae26-621e-42a1-8c7a-b41d5fa63c4a", #Name: Ae86rkw , Status: ACTIVE
+    "e930a4ae-5870-4937-ae03-3d9bce82c1fc", #Name: PATRICIA  SHMUCKER, Status: ACTIVE
+    "3497b9f7-780f-46e0-821e-a236d8cc53ec", #Name: PATRICIA SHMUCKER, Status: ACTIVE
 }
 
 # Global variables for session token and CSRF token (for delete action)
@@ -115,12 +121,32 @@ def delete_user(user_id, user_name):
             print(f"❌ Failed to delete {user_name}: {response.status_code} - {response.text}")
 
     except requests.exceptions.RequestException as e:
-        print(f"❌ Request failed for {user_name}: {e}")
+        print(f"❌ Request failed for {user_name}:", e)
 
 # Main execution
 if __name__ == "__main__":
     users = fetch_all_users()
     
+    # Dry-run confirmation before deletion
+    dry_run_users = []
+    for user in users:
+        user_id = user.get("id")
+        user_name = user.get("first_name", "Unknown") + " " + user.get("last_name", "Unknown")
+        user_status = user.get("status")
+
+        if user_id not in ALLOWED_USERS and user_status == "DEACTIVATED":
+            dry_run_users.append((user_name, user_id))
+
+    if dry_run_users:
+        print("\n⚠️  The following users will be deleted:")
+        for name, uid in dry_run_users:
+            print(f"- {name} ({uid})")
+
+        confirm = input("\nProceed with deletion? (Y/N): ").strip().lower()
+        if confirm != 'y':
+            print("❌ Deletion canceled.")
+            exit(0)
+
     if users:
         print("🔍 Processing users...")
         for user in users:
