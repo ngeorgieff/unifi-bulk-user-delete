@@ -1,129 +1,74 @@
-# Unifi User Management Script
+# UniFi Access - Bulk User Management & License Plate Assignment
 
 ## Overview
-This script automates the **bulk deactivation and deletion of users** from a **UniFi Access system** using the **UniFi API** and session authentication.
+This repository provides Python scripts for managing users and credentials in UniFi Access. It allows you to:
 
-### Why This Script?
-I was looking for a way to **bulk delete users from UniFi Access**, but there was **no way to do it through the UI or any documented API**. After analyzing network requests, I identified the necessary API calls to achieve this functionality.
+✅ **Fetch all users** from UniFi Access.
+✅ **Bulk deactivate & delete users** (except for whitelisted ones).
+✅ **Assign license plates** to users based on a CSV file.
 
-### Features
-- ✅ Fetches users from UniFi UDM Pro using an API key.
-- ✅ Deactivates users **not in the allowed list**.
-- ✅ Authenticates with **local admin credentials** for deletion.
-- ✅ **Deletes deactivated users** securely using session tokens.
-- ✅ Includes **error handling** and **logging** for debugging.
-
----
+## Features
+- Uses **API Key authentication** for fetching users.
+- Uses **local admin login** for modifying users (deactivation, deletion, adding license plates).
+- Supports **dry-run mode** for safe execution before deletion.
 
 ## Prerequisites
-- **Python 3.x**
-- **pip installed**
-- **Access to your UniFi UDM Pro**
-- **Environment variables set for authentication**
-
----
-
-## Installation
-Clone the repository and navigate to the project directory:
-```bash
-git clone https://github.com/ngeorgieff/unifi-bulk-user-delete.git
-cd unifi-bulk-user-delete
-```
-
-Install required dependencies:
-```bash
-pip install requests python-dotenv
-```
-
----
-
-## Configuration
-Set environment variables before running the scripts:
-
-```bash
-export UNIFI_API_KEY="your-api-key"
-export UNIFI_ADMIN_USER="your-admin-username"
-export UNIFI_ADMIN_PASS="your-admin-password"
-```
-
-Add these to your `~/.bashrc`, `~/.bash_profile`, or `.env` file for persistence.
-
----
+1. **UniFi UDM Pro / UniFi Access Setup**
+2. **Python 3.6+ Installed**
+3. Required Python packages:
+   ```bash
+   pip install requests urllib3
+   ```
+4. Set up the following **environment variables**:
+   ```bash
+   export UNIFI_CONSOLE_IP="192.168.1.231"
+   export UNIFI_API_KEY="your-api-key"
+   export UNIFI_ADMIN_USER="your-admin-username"
+   export UNIFI_ADMIN_PASS="your-admin-password"
+   ```
 
 ## Usage
 
-### Step 1: Fetch Users and Get Their UIDs
-Before deleting users, first **fetch all users** and get their **UIDs**:
-
+### 1️⃣ Fetch Users
+Run `fetch_users.py` to get a list of all users:
 ```bash
 python3 fetch_users.py
 ```
 
-This will print a list of users in the format:
-
-```bash
+✅ **Output Example:**
+```
 Fetched Users:
 ID: d3950ced-0b7c-41fe-88f4-1251b076921a, Name: Homebridge API, Status: ACTIVE
-ID: 07331101-623c-4f51-8958-a190ad77669d, Name: homeassistant-api , Status: ACTIVE
 ...
 ```
 
-### Step 2: Update `delete_users.py` with Allowed UIDs
-Modify the `ALLOWED_USERS` list in `delete_users.py` with **UIDs of users you want to keep**:
-
-```python
-ALLOWED_USERS = {
-    "d3950ced-0b7c-41fe-88f4-1251b076921a",  # Homebridge API
-    "07331101-623c-4f51-8958-a190ad77669d",  # homeassistant-api
-}
-```
-
-### Step 3: Run the Deletion Script
-Once you have updated the **allowed users**, run:
-
+### 2️⃣ Deactivate & Delete Users
+1. **Fetch users first** (`fetch_users.py`).
+2. **Edit `delete_users.py`** to add user IDs you want to keep.
+3. **Run the script:**
 ```bash
 python3 delete_users.py
 ```
+✅ **Supports dry-run mode** before actual deletion.
 
-Expected output:
-```bash
-🔍 Processing users...
-🚨 Deactivating user: John Doe (22eb5f2a-ed6c-4d32-a22f-401a4688a4f3)
-✅ Successfully deactivated: John Doe (22eb5f2a-ed6c-4d32-a22f-401a4688a4f3)
-✅ Successfully authenticated. Session token retrieved.
-🗑️ Removing user: John Doe (22eb5f2a-ed6c-4d32-a22f-401a4688a4f3)
-🗑️ Successfully deleted: John Doe (22eb5f2a-ed6c-4d32-a22f-401a4688a4f3)
-✅ User deactivation & removal process completed.
-```
+### 3️⃣ Assign License Plates
+1. **Prepare a CSV file (`license_plates.csv`)**:
+   ```csv
+   email,license_plate
+   user1@example.com,ABC123
+   user2@example.com,XYZ987
+   ```
+2. **Run the script**:
+   ```bash
+   python3 add_license_plate.py
+   ```
+✅ **Script will match users by email and add the license plate.**
 
----
+## Notes
+- **No bulk delete option exists in the UniFi UI**—this script automates the process.
+- **License plate assignment requires local admin login**, not just an API key.
+- The `fetch_users.py` script is required to retrieve user IDs before running `delete_users.py` or `add_license_plate.py`.
 
-## Troubleshooting
+## Support
+If you encounter any issues, feel free to open an issue or contribute!
 
-### **401 Unauthorized?**
-- Ensure the API key has the correct permissions.
-- Verify the local admin credentials are correct.
-- Ensure the session token is correctly extracted and passed.
-
-### **Users not deleting?**
-- Make sure the user is **deactivated** before deletion.
-- Ensure the script is using the correct **DELETE endpoint**.
-
----
-
-## License
-This project is licensed under the **MIT License**. Feel free to modify and distribute.
-
----
-
-## Contributing
-Feel free to submit **pull requests** and contribute to improvements! 🚀
-
----
-
-## Author
-👤 Nikolay Georgiev
-📧 n@data-protect.net
-📌 **GitHub:** [ngeorgieff](https://github.com/ngeorgieff)
-# unifi-bulk-user-delete
-# unifi-bulk-user-delete
